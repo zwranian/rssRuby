@@ -1,5 +1,5 @@
-$B;HMQJ}K!(B
-1.$B3F%U%!%$%k$N>l=j$r@dBP%Q%9$G;XDj$7$F$$$k$N$G!"3F<+$N4D6-$K9g$o$;$FJQ99$9$k(B
-2.rssResource,rssHistory$B$r:n@.$9$k(B
-3.rssResource$B$K<hF@$7$?$$(BRSS$B$N(BURL$B$r0l9T$:$D5-F~$9$k(B
-4.Twitter$B$N(Bconsumer_key$B$J$I0l<0$r<hF@$7$F!"(Baccess_token.rb$B$rJT=8$9$k(B
+»ÈÍÑÊýË¡
+1.³Æ¥Õ¥¡¥¤¥ë¤Î¾ì½ê¤òÀäÂÐ¥Ñ¥¹¤Ç»ØÄê¤·¤Æ¤¤¤ë¤Î¤Ç¡¢³Æ¼«¤Î´Ä¶­¤Ë¹ç¤ï¤»¤ÆÊÑ¹¹¤¹¤ë
+2.rssResource,rssHistory¤òºîÀ®¤¹¤ë
+3.rssResource¤Ë¼èÆÀ¤·¤¿¤¤RSS¤ÎURL¤ò°ì¹Ô¤º¤Äµ­Æþ¤¹¤ë
+4.Twitter¤Îconsumer_key¤Ê¤É°ì¼°¤ò¼èÆÀ¤·¤Æ¡¢access_token.rb¤òÊÔ½¸¤¹¤ë

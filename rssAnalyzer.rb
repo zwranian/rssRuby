@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
-###RSSã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
+###RSS¤òÉ½¤¹¥¯¥é¥¹
 class RssAnalyze
     require 'net/http'
     require '/home/pi/rss/twitterPost'
@@ -9,14 +9,14 @@ class RssAnalyze
     require 'rexml/document'
     include REXML
     attr_accessor:source,:ary,:historys
-    ##ãƒ¡ã‚½ãƒƒãƒ‰å®£è¨€
-    #å®Ÿè¡Œã—ãŸã‚‰ã¾ã å–å¾—ã—ã¦ãªã„è¨˜äº‹ã®URLã¨ã‚¿ã‚¤ãƒˆãƒ«ã‚’é…åˆ—ã‹ãƒªã‚¹ãƒˆã§è¿”ã™ãƒ¡ã‚½ãƒƒãƒ‰
+    ##¥á¥½¥Ã¥ÉÀë¸À
+    #¼Â¹Ô¤·¤¿¤é¤Ş¤À¼èÆÀ¤·¤Æ¤Ê¤¤µ­»ö¤ÎURL¤È¥¿¥¤¥È¥ë¤òÇÛÎó¤«¥ê¥¹¥È¤ÇÊÖ¤¹¥á¥½¥Ã¥É
     def initialize(sourceUrl)
         @source=sourceUrl
         @ary=Array.new
         @historys=Set.new
     end
-    #rssResourceã‹ã‚‰ç™»éŒ²ãƒ•ã‚£ãƒ¼ãƒ‰ã‚’å–å¾—ã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
+    #rssResource¤«¤éÅĞÏ¿¥Õ¥£¡¼¥É¤ò¼èÆÀ¤¹¤ë¥á¥½¥Ã¥É
     def fetchRSS
         puts "fetch "+@source
         url = URI.parse(@source)
@@ -27,15 +27,15 @@ class RssAnalyze
         doc = REXML::Document.new(res.body)
         type = doc.root.attributes["xmlns"]
         c = nil
-        #RSSã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒã„ãã¤ã‹ã‚ã‚‹ã®ã§å¯¾å¿œ
-        #ä¸€ã¤ç›®
+        #RSS¤Î¥Õ¥©¡¼¥Ş¥Ã¥È¤¬¤¤¤¯¤Ä¤«¤¢¤ë¤Î¤ÇÂĞ±ş
+        #°ì¤ÄÌÜ
         if type == "http://www.w3.org/2005/Atom" then
             doc.elements.each("feed/entry"){|item|
                 title = item.elements["title"].text
                 link = item.elements["link"].attributes["href"]
                 c = Content.new(link,title,"",item.elements["updated"].text)
             }
-        #äºŒã¤ç›®
+        #Æó¤ÄÌÜ
         elsif type == "http://purl.org/rss/1.0/" 
             rss = RSS::Parser.parse(@source)
             rss.items.each do |item|
@@ -43,7 +43,7 @@ class RssAnalyze
                 link = item.about
                 c = Content.new(link,title,"",item.date.to_s)
             end
-        #ä¸‰ã¤ç›®
+        #»°¤ÄÌÜ
         else   
             doc.elements.each("rss/channel/item"){|item|
                 title = item.elements["title"].text
@@ -56,15 +56,15 @@ class RssAnalyze
         end
     end
     
-    #å–å¾—ã—ãŸXMLã‚’è§£æã—ã¦ã€ä»¥å‰å–å¾—ã—ãŸè¨˜äº‹ä»¥é™ã®ãƒ‡ãƒ¼ã‚¿ã‚’è¿”ã™
+    #¼èÆÀ¤·¤¿XML¤ò²òÀÏ¤·¤Æ¡¢°ÊÁ°¼èÆÀ¤·¤¿µ­»ö°Ê¹ß¤Î¥Ç¡¼¥¿¤òÊÖ¤¹
     def postNewEntry
          @ary.each{|a|
             begin
-            #æ–°ç€ã‚’è¦‹æ¥µã‚ã‚‹ãŸã‚ã«å–å¾—æ¸ˆã¿ã®ã‚¨ãƒ³ãƒˆãƒªã‚’ãƒ•ã‚£ãƒ«ã‚¿ãƒªãƒ³ã‚°ã™ã‚‹
+            #¿·Ãå¤ò¸«¶Ë¤á¤ë¤¿¤á¤Ë¼èÆÀºÑ¤ß¤Î¥¨¥ó¥È¥ê¤ò¥Õ¥£¥ë¥¿¥ê¥ó¥°¤¹¤ë
                 if @historys.include?(a.url) then
                     next
                 else 
-                    #ãƒ„ã‚¤ãƒ¼ãƒˆ
+                    #¥Ä¥¤¡¼¥È
                     #puts "Post: "+a.url
                     Twitter.update(a.title+"- "+a.url)
                  end
@@ -77,7 +77,7 @@ class RssAnalyze
         end
     end
 
-##ãƒã‚¹ãƒˆå†…å®¹ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
+##¥İ¥¹¥ÈÆâÍÆ¤òÉ½¤¹¥¯¥é¥¹
 class Content
     attr_reader :url, :title, :homeTitle, :date
     def initialize(url,title,homeTitle,date)

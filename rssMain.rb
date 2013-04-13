@@ -4,7 +4,7 @@ require 'rexml/document'
 require 'tempfile'
 require 'set'
 include REXML
-#$B=i4|=hM}(B
+#½é´ü½èÍý
 tmp = Tempfile::new("tmp","/home/pi/rss/")
 rssAry = Array.new
 hisSet = Set.new
@@ -14,19 +14,19 @@ sites.each {|line|
     rssAry.push( RssAnalyze.new(line.chomp) )
 }
 sites.close
-#$BMzNr<hF@(B
+#ÍúÎò¼èÆÀ
 history.each{|entry|
    hisSet.add(entry.chomp)    
 }
 history.close
     
-#RSS$B<hF@$r<B9T$9$k(B
+#RSS¼èÆÀ¤ò¼Â¹Ô¤¹¤ë
 rssAry.each {|rss|
    rss.historys=hisSet
    rss.fetchRSS() 
    rss.postNewEntry()
 }
-#$B99?7MzNr$r0l<!%U%!%$%k$X=q$-9~$`(B
+#¹¹¿·ÍúÎò¤ò°ì¼¡¥Õ¥¡¥¤¥ë¤Ø½ñ¤­¹þ¤à
 rssAry.each{|rss|
     rss.ary.each{|entry|
         tmp.puts(entry.url)
@@ -34,7 +34,7 @@ rssAry.each{|rss|
 }
 tmp.close
 tmp.open
-#$B<!2s$N%U%#%k%?%j%s%0$N$?$a:#2s$N%(%s%H%j!<$rJ]B8(B
+#¼¡²ó¤Î¥Õ¥£¥ë¥¿¥ê¥ó¥°¤Î¤¿¤áº£²ó¤Î¥¨¥ó¥È¥ê¡¼¤òÊÝÂ¸
 open("/home/pi/rss/rssHistory","w"){|f|
     tmp.each{|line|
         f.puts(line)

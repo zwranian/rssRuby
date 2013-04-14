@@ -26,7 +26,6 @@ class RssAnalyze
         }
         doc = REXML::Document.new(res.body)
         type = doc.root.attributes["xmlns"]
-        c = nil
         #RSSのフォーマットがいくつかあるので対応
         #一つ目
         if type == "http://www.w3.org/2005/Atom" then
@@ -34,6 +33,7 @@ class RssAnalyze
                 title = item.elements["title"].text
                 link = item.elements["link"].attributes["href"]
                 c = Content.new(link,title,"",item.elements["updated"].text)
+            @ary.push c
             }
         #二つ目
         elsif type == "http://purl.org/rss/1.0/" 
@@ -42,6 +42,7 @@ class RssAnalyze
                 title = item.title
                 link = item.about
                 c = Content.new(link,title,"",item.date.to_s)
+            @ary.push c
             end
         #三つ目
         else   
@@ -49,10 +50,8 @@ class RssAnalyze
                 title = item.elements["title"].text
                 link = item.elements["link"].text
                 c = Content.new(link,title,"",item.elements["pubDate"].text)
-            }
-        end
-        if c != nil then
             @ary.push c
+            }
         end
     end
     

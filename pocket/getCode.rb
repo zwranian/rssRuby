@@ -23,7 +23,6 @@ https.start do |hs|
     request.body = {
         consumer_key: @consumer_key,
         redirect_uri:"http://www.google.com"}.to_json
-    buf=""
     hs.request(request) do |response|
         status = JSON.parse(response.body)
         code = status['code']

@@ -1,4 +1,5 @@
 module AccessToken_Pocket
-   ACCESSTOKEN_POCKET =""
    CONSUMERKEY_POCKET =""
+   ACCESSTOKEN_POCKET =""
+   REDIRECT_URI       ="http://google.com"
 end

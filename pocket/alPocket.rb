@@ -15,10 +15,6 @@ class ALPocket
         @redirect_uri = REDIRECT_URI
     end
 
-#    private:getRequestToken
-#    private:login
-#    private:getAccessToken
-
     def getRequestToken
         uri = URI.parse("https://getpocket.com/v3/oauth/request")
         https = Net::HTTP.new(uri.host,uri.port)
@@ -42,7 +38,7 @@ class ALPocket
                 end
             end
         end
-        
+
         #取得エラーチェック
         case response
         when Net::HTTPOK
@@ -51,7 +47,8 @@ class ALPocket
             p "error getRequestToken:"+response.body.to_s
         end
     end
-
+    private:getRequestToken
+    
     def login(user,passwd,code)
         #インスタンス生成、IE偽装
         agent = Mechanize.new
@@ -75,12 +72,13 @@ class ALPocket
             page = form.click_button
         rescue Mechanize::RedirectLimitReachedError
         end
-        
+
         #ログインエラーチェック
         if page.uri != @redirect_uri
-            p "erro login: "
+            p "error login: login failed."
         end
     end
+    private:login
 
     def getAccessToken(code)
         uri = URI.parse("https://getpocket.com/v3/oauth/authorize")
@@ -89,9 +87,9 @@ class ALPocket
         https.ca_file = OpenSSL::X509::DEFAULT_CERT_FILE
         https.verify_depth = 5
         https.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        
+
         access_token=nil
-        
+
         response = https.start do |hs|
             request = Net::HTTP::Post.new(uri.request_uri)
             request["Content-Type"] = "application/json; charset=UTF-8"
@@ -105,7 +103,7 @@ class ALPocket
                 end
             end
         end
-        
+
         #取得エラーチェック
         case response
         when Net::HTTPOK
@@ -115,8 +113,9 @@ class ALPocket
             p "error getAccessToken:"+response.body.to_s
         end
     end
-    
-    def post(url, title, tweetid)
+    private:getAccessToken
+
+    def add(url, title, tweetid)
         uri = URI.parse("https://getpocket.com/v3/add")
         https = Net::HTTP.new(uri.host,uri.port)
         https.use_ssl = true
@@ -133,32 +132,40 @@ class ALPocket
                 }.to_json
             hs.request(request)
         end
-        
+
         #投稿エラーチェック
         case response
-        when Net::HTTPClientError
+        when Net::HTTPOK
+            return true
+        else
             p "error post:"+response.body.to_s
+            return false
         end
     end
+    private:add
+
+    def post(url, title, tweetid)
+        if !add(url, title, tweetid)
+            #リクエストトークン取得
+            request_token = getRequestToken
+
+            #Webログイン(PocketID,Passwordを設定)
+            login("ID","PASS",request_token)
+
+            #アクセストークン取得
+            getAccessToken(request_token)
+            return add(url, title, tweetid)
+        else
+            return true
+        end
+    end 
 end
+
+
 
 
 # テストコード #
 pocket = ALPocket.new
-
-#テストポスト(エラー)
-pocket.post("http://google.com","テストグーグル",nil)
-
-#リクエストトークン取得&表示
-req_tkn = pocket.getRequestToken
-p "main requestToken: "+req_tkn.to_s
-
-#Webログイン(PocketID,Passwordを設定)
-pocket.login("ID","PASS",req_tkn)
-
-#アクセストークン取得&表示
-acs_tkn = pocket.getAccessToken(req_tkn)
-p "main accessToken: "+acs_tkn.to_s
 
 #テストポスト
 pocket.post("http://google.com","テストグーグル",nil)

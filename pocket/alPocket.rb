@@ -2,6 +2,7 @@
 require 'net/https'
 require 'pp'
 require 'json'
+require 'logger'
 require 'rubygems'
 require 'mechanize'
 require './accessToken_Pocket.rb'
@@ -19,6 +20,7 @@ class ALPocket
         @consumer_key = CONSUMERKEY_POCKET
         @access_token = nil
         @redirect_uri = REDIRECT_URI
+        @logger = Logger.new(STDOUT)
     end
 
     #PocketへItemを追加(title効いてない?)
@@ -28,7 +30,7 @@ class ALPocket
             request_token = getRequestToken
 
             #Webログイン(PocketID,Passwordを設定)
-            login("ID","PASS",request_token)
+            login(USERNAME_POCKET, PASSWORD_POCKET, request_token)
 
             #アクセストークン取得
             getAccessToken(request_token)
@@ -79,9 +81,10 @@ class ALPocket
                 request_token = JSON.parse(response.body)['code']
             rescue JSON::ParserError
             end
+            @logger.info("(getRequestToken) successful. "+request_token)
             return request_token
         else
-            p "error getRequestToken:"+response.body.to_s
+            @logger.error("(getRequestToken) "+response.body.to_s)
         end
     end
     private:getRequestToken
@@ -90,8 +93,9 @@ class ALPocket
         #インスタンス生成、IE偽装
         agent = Mechanize.new
         agent.user_agent_alias = 'Windows IE 9'
-        agent.redirect_ok = 'true'
-        agent.redirection_limit = 1
+        agent.redirect_ok = true
+        agent.follow_meta_refresh = true
+        agent.redirection_limit = 2
 
         #ログインページへアクセス
         uri = URI.parse(LOGIN_URI+"?request_token="+code+"&redirect_uri"+@redirect_uri)
@@ -105,16 +109,18 @@ class ALPocket
         form.field_with(:name => 'password').value = passwd
 
         #formをsubmit
+#            page = form.click_button
         begin
             page = form.click_button
         rescue Mechanize::RedirectLimitReachedError
         end
 
-        #チェック失敗してる
-#        #ログインエラーチェック
-#        if page.uri != @redirect_uri
-#            p "error login: login failed."
-#        end
+        #ログインエラーチェック
+        if agent.history.last.uri.to_s.include?("approve_access")
+            @logger.info("(login) successful. "+user)
+        else
+            @logger.fatal("(login) failed. "+user)
+        end
     end
     private:login
 
@@ -135,9 +141,10 @@ class ALPocket
             rescue JSON::ParserError
             end
             @access_token = access_token
+            @logger.info("(getAccessToken) successful. "+access_token)
             return access_token
         else
-            p "error getAccessToken:"+response.body.to_s
+            @logger.error("(getAccessToken) "+response.body.to_s)
         end
     end
     private:getAccessToken
@@ -155,13 +162,20 @@ class ALPocket
         #投稿エラーチェック
         case response
         when Net::HTTPOK
+            @logger.info("(post) successful. "+url)
             return true
         else
-            p "error post:"+response.body.to_s
+            @logger.error("(post) "+response.body.to_s)
             return false
         end
     end
     private:add
+
+    def setLogger(logger)
+        if logger.is_a? Logger
+            @logger = logger
+        end
+    end
 end
 
 

@@ -57,6 +57,7 @@ class RssAnalyze
     
     #取得したXMLを解析して、以前取得した記事以降のデータを返す
     def postNewEntry
+        postAry = Array.new
          @ary.each{|a|
             begin
             #新着を見極めるために取得済みのエントリをフィルタリングする
@@ -66,15 +67,17 @@ class RssAnalyze
                     #ツイート
                     #puts "Post: "+a.url
                     Twitter.update(a.title+"- "+a.url)
+                    postAry.push(a.url)
                  end
             rescue Twitter::Error::Forbidden => ex
                     @ary.delete(a)
             rescue => ex
                     @ary.delete(a)
         end
-         }
-        end
-    end
+        }
+        return postAry
+   end
+end
 
 ##ポスト内容を表すクラス
 class Content

@@ -6,7 +6,7 @@
     require 'json'
     require 'pp'
     require '/home/pi/rss/access_token.rb'
-    require '/home/pi/rss/pocket/pocketPost.rb'
+    require '/home/pi/rss/pocket/alPocket.rb'
 module TwitterBot
     class Bot
         include AccessToken
@@ -24,7 +24,7 @@ module TwitterBot
                                                     ACCESS_TOKEN,
                                                     ACCESS_TOKEN_SECRET
                                                     )
-            @pocketPost =PocketPost.new()
+            @alPocket = ALPocket.new()
         end
 
         def connect 
@@ -75,8 +75,10 @@ module TwitterBot
                                     text_split.each {|t|
                                         title = title+t
                                     }
+                                    #tweet_id
+                                    id = json['target_object']['id']
                                     puts "title: "+title+", url: "+url
-                                    @pocketPost.post(url,title)
+                                    @alPocket.post(url,title,id)
                                 end
                             end
                         else

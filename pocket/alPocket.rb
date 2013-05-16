@@ -4,7 +4,8 @@ require 'pp'
 require 'json'
 require 'logger'
 require 'rubygems'
-require 'mechanize'
+require 'openssl'
+#require 'mechanize'
 require './accessToken_Pocket.rb'
 
 class ALPocket
@@ -18,7 +19,7 @@ class ALPocket
 
     def initialize
         @consumer_key = CONSUMERKEY_POCKET
-        @access_token = nil
+        @access_token = ACCESSTOKEN_POCKET
         @redirect_uri = REDIRECT_URI
         @logger = Logger.new(STDOUT)
     end
@@ -182,7 +183,7 @@ end
 
 
 # テストコード #
-pocket = ALPocket.new
+#pocket = ALPocket.new
 
 #テストポスト
-pocket.post("http://getpocket.com/","テスト",nil)
+#pocket.post("http://getpocket.com/","test",nil)
